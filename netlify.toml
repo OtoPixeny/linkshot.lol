@@ -1,0 +1,27 @@
+# Netlify configuration for React SPA
+[[redirects]]
+  # Handle static assets first
+  "/assets/*"  "/assets/:splat"  200
+  
+  # Fallback all other routes to index.html for React Router
+  "/*"        "/index.html"    200
+
+# Set proper MIME types
+[build]
+  publish = "dist"
+
+# Headers for proper MIME types
+[[headers]]
+  for = "/assets/*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/assets/*.css"
+  [headers.values]
+    Content-Type = "text/css"
+
+[[headers]]
+  for = "/assets/*.json"
+  [headers.values]
+    Content-Type = "application/json"
