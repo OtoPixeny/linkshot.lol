@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Hero from '@/components/Hero'
 import FixedImage from '@/components/FixedImage'
+import PopupModal from '@/components/PopupModal'
 
 // Import pages (we'll create these next)
 import Home from '@/pages/Home'
@@ -39,6 +40,7 @@ function App() {
         </main>
         <Footer />
         <Toaster position="bottom-right" />
+        <PopupModal />
       </div>
     </ThemeProvider>
   )

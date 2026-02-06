@@ -477,42 +477,46 @@ export default function ManageForm() {
           </div>
         </TabsContent>
 
-        <TabsContent value="messaging" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="discord">Discord</Label>
+        <TabsContent value="messaging" className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label htmlFor="discord" className="text-sm">Discord</Label>
               <Input
                 id="discord"
                 value={discord}
                 onChange={(e) => setDiscord(e.target.value)}
                 placeholder="Discord username"
+                className="h-9 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="telegram">Telegram</Label>
+            <div className="space-y-1">
+              <Label htmlFor="telegram" className="text-sm">Telegram</Label>
               <Input
                 id="telegram"
                 value={telegram}
                 onChange={(e) => setTelegram(e.target.value)}
                 placeholder="Telegram username"
+                className="h-9 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp</Label>
+            <div className="space-y-1">
+              <Label htmlFor="whatsapp" className="text-sm">WhatsApp</Label>
               <Input
                 id="whatsapp"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder="WhatsApp number"
+                className="h-9 text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="skype">Skype</Label>
+            <div className="space-y-1">
+              <Label htmlFor="skype" className="text-sm">Skype</Label>
               <Input
                 id="skype"
                 value={skype}
                 onChange={(e) => setSkype(e.target.value)}
                 placeholder="Skype username"
+                className="h-9 text-sm"
               />
             </div>
           </div>

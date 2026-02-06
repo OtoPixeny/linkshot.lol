@@ -15,6 +15,10 @@ export default function Hero() {
     const handleMouseMove = (e) => {
       if (!heroRef.current) return;
       
+      // Check if any dropdown is open
+      const dropdownOpen = document.querySelector('[data-state="open"]');
+      if (dropdownOpen) return;
+      
       const rect = heroRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -90,16 +94,6 @@ export default function Hero() {
           className="demoimg rounded-lg"
           src="/assets/homepage-dark.png"
           alt="Preview"
-        />
-        <img
-          className="overlay-img"
-          src="https://i.imgur.com/AHgf4Ge.png"
-          alt="Overlay"
-        />
-        <img
-          className="overlay-img-right"
-          src="https://i.imgur.com/AHgf4Ge.png"
-          alt="Overlay Right"
         />
       </div>
     </div>

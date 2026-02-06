@@ -1,10 +1,12 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import Logo from "./Logo";
-import { CornerRightDown, Trophy, Moon, Sun } from "lucide-react";
+import { CornerRightDown, Trophy, Moon, Sun, LayoutDashboard, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useUser } from "@clerk/clerk-react";
 import { UserButton } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import UserModel from "@/models/user";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,18 +19,36 @@ export default function Header() {
   const location = useLocation();
   const isTop3Page = location.pathname === '/top3';
   const { setTheme, resolvedTheme } = useTheme();
-  
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (user?.id && !username) {
+        try {
+          const userData = await UserModel.getByUserId(user.id);
+          if (userData) {
+            setUsername(userData.username);
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        }
+      }
+    };
+
+    loadUserData();
+  }, [user, username]);
+
   const DownIcon = () => (
     <svg fill="currentColor" width="16px" height="16px" viewBox="0 -6 524 524" xmlns="http://www.w3.org/2000/svg">
       <title>down</title>
       <path d="M64 191L98 157 262 320 426 157 460 191 262 387 64 191Z" />
     </svg>
   );
-  
+
   return (
-    <header className={`navigation flex justify-between items-center py-5 px-6 sm:px-8 md:px-20 lg:px-24 ${
-      isTop3Page ? 'bg-transparent' : ''
-    }`}>
+    <header className={`navigation flex justify-between items-center py-5 px-6 sm:px-8 md:px-20 lg:px-24 ${isTop3Page ? 'bg-transparent' : ''
+      }`}>
       <div>
         <Logo />
       </div>
@@ -47,7 +67,7 @@ export default function Header() {
                 <CornerRightDown className="!h-4 !w-4" />
               </Link>
             </Button>
-            <UserButton 
+            <UserButton
               appearance={{
                 elements: {
                   avatarBox: " !h-8 !w-8 ",
@@ -55,7 +75,24 @@ export default function Header() {
                 }
               }}
               afterSignOutUrl="/"
-            />
+            ><UserButton.MenuItems>
+                <UserButton.Action
+                  label="დეშბორდი"
+                  labelIcon={<LayoutDashboard className="h-4 w-4" />}
+                  onClick={() => navigate('/dashboard')}
+                />
+                <UserButton.Action
+                  label="ჩემი ფეიჯი"
+                  labelIcon={<User className="h-4 w-4" />}
+                  onClick={() => {
+                    if (username) {
+                      navigate(`/${username}`);
+                    }
+                  }}
+                />
+              </UserButton.MenuItems>
+            </UserButton>
+
           </>
         ) : (
           <Button asChild size="sm">
@@ -80,12 +117,12 @@ export default function Header() {
               {resolvedTheme === "light" ? (
                 <>
                   <Moon className="h-4 w-4" />
-                  მუქე თემა
+                  ბნელი თემა
                 </>
               ) : (
                 <>
                   <Sun className="h-4 w-4" />
-                  ნათელი თემა
+                  ღია თემა
                 </>
               )}
             </DropdownMenuItem>

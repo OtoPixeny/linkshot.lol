@@ -194,6 +194,14 @@
   .hero-btn {
     width: 100%;
   }
+  .popup-modal-buttons {
+  width: 100%;
+  display: flex;
+  font-size: 12px !important;
+  gap: 1rem;
+  justify-content: space-between;
+ }
+
 }
 
 .rounded-lg{
@@ -333,6 +341,7 @@
   z-index: 10;
   transition: all 0.5s;
   opacity: 0.5;
+  animation: floatUpDown 3s ease-in-out infinite;
 }
 
 .overlay-img-right{
@@ -347,6 +356,7 @@
   z-index: 10;
   transition: all 0.5s;
   opacity: 0.5;
+  animation: floatUpDown 3.5s ease-in-out infinite;
 }
 
 .overlay-img-right:hover{
@@ -472,4 +482,190 @@
 .top-avatar{
   width: 200px !important;
   height: auto !important;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes floatUpDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.refresh-rank{
+  border-radius: 9999px;
+}
+
+/* Increase border-radius for inputs in ManageForm */
+.manage-form input {
+  border-radius: 12px !important;
+}
+
+/* Remove focus ring from inputs in ManageForm to prevent double border */
+.manage-form input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Add rounded border-radius to profile update button in ManageForm */
+.manage-form button {
+  border-radius: 12px !important;
+}
+
+/* Remove focus ring from the "სხვა" dropdown button to prevent double border */
+[data-radix-dropdown-menu-trigger] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+[data-radix-dropdown-menu-trigger]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Popup Modal Styles */
+.popup-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.048);
+  backdrop-filter: blur(15px);
+  transition: opacity 0.3s ease;
+}
+
+.popup-backdrop-visible {
+  opacity: 1;
+}
+
+.popup-backdrop-hidden {
+  opacity: 0;
+}
+
+.popup-modal-content {
+  position: relative;
+  background: none;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 1000px;
+  width: 100%;
+  
+  margin: 0 0rem;
+  transition: all 0.3s ease;
+  transform: scale(0.95) translateY(1rem);
+  opacity: 0;
+}
+
+.popup-content-visible {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  background: none !important;
+}
+
+.popup-content-hidden {
+  transform: scale(0.95) translateY(1rem);
+  opacity: 0;
+}
+
+.popup-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: rgb(156 163 175);
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.popup-modal-close:hover {
+  color: rgb(75 85 99);
+}
+
+.popup-modal-image-container {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.popup-modal-image{
+  border-radius: 2rem;
+  max-width: 100%;
+  height: auto;
+  width: 100%;
+}
+
+.popup-modal-buttons {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+ }
+
+.popup-modal-button {
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  transform: scale(1);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.popup-modal-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.popup-modal-button:active {
+  transform: scale(0.95);
+}
+
+.popup-modal-button-primary {
+  background-color: rgb(37 99 235);
+  color: white;
+}
+
+.popup-modal-button-primary:hover {
+  background-color: rgb(29 78 216);
+}
+
+.popup-modal-button-secondary {
+  background-color: rgb(241, 70, 70);
+  color: white;
+}
+
+.popup-modal-button-secondary:hover {
+  background-color: rgb(55 65 81);
+}
+
+/* Dark mode styles for popup */
+.dark .popup-modal-content {
+  background-color: rgb(17 24 39);
+}
+
+.dark .popup-modal-close {
+  color: rgb(156 163 175);
+}
+
+.dark .popup-modal-close:hover {
+  color: rgb(209 213 219);
 }

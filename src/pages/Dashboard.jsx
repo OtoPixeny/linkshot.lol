@@ -98,7 +98,7 @@ export default function Dashboard() {
                   <Button 
                     onClick={handleUpdateRanks}
                     disabled={isUpdatingRanks}
-                    className="flex items-center gap-2"
+                    className="refresh-rank flex items-center gap-2"
                   >
                     <RefreshCw className={`w-4 h-4 ${isUpdatingRanks ? 'animate-spin' : ''}`} />
                     {isUpdatingRanks ? 'განახლდება...' : 'რანკების განახლება'}
