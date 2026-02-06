@@ -93,12 +93,12 @@ export default function Hero() {
         />
         <img
           className="overlay-img"
-          src="https://i.imgur.com/nti7uI6.png"
+          src="https://i.imgur.com/AHgf4Ge.png"
           alt="Overlay"
         />
         <img
           className="overlay-img-right"
-          src="https://i.imgur.com/nti7uI6.png"
+          src="https://i.imgur.com/AHgf4Ge.png"
           alt="Overlay Right"
         />
       </div>
