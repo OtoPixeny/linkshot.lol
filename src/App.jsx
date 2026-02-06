@@ -40,7 +40,7 @@ function App() {
         </main>
         <Footer />
         <Toaster position="bottom-right" />
-        <PopupModal />
+        {!isUserProfilePage && <PopupModal />}
       </div>
     </ThemeProvider>
   )

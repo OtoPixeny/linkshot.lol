@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import ManageForm from '@/components/ManageForm'
 import UserPageLink from '@/components/UserPageLink'
 import { useUser } from "@clerk/clerk-react"
-import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X } from "lucide-react"
+import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink } from "lucide-react"
 import UserModel from "@/models/user"
 import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
@@ -21,21 +21,23 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState('')
   const [isSettingPassword, setIsSettingPassword] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
+  const [userData, setUserData] = useState(null)
 
-  // Load current access key on component mount
+  // Load current access key and user data on component mount
   useEffect(() => {
-    const loadCurrentPassword = async () => {
+    const loadUserData = async () => {
       if (!user?.id) return
       
       try {
         const userData = await UserModel.getByUserId(user.id)
+        setUserData(userData)
         setCurrentPassword(userData?.accessKey || '')
       } catch (error) {
-        console.error('Error loading current password:', error)
+        console.error('Error loading user data:', error)
       }
     }
     
-    loadCurrentPassword()
+    loadUserData()
   }, [user?.id])
   
   if (!user) {
@@ -57,6 +59,7 @@ export default function Dashboard() {
     { id: 'profile', label: 'პროფილი', icon: User },
     { id: 'security', label: 'უსაფრთხოება', icon: Shield },
     { id: 'logout', label: 'გასვლა', icon: LogOut },
+    { id: 'mypage', label: 'ჩემი ფეიჯი', icon: ExternalLink },
   ]
 
   const handleUpdateRanks = async () => {
@@ -223,6 +226,66 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold">ანალიტიკა</h2>
           </div>
         )
+      case 'mypage':
+        return (
+          <div className="max-w-md mx-auto mt-6 px-4">
+            <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <ExternalLink className="w-8 h-8 text-primary" />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">ჩემი ფეიჯი</h3>
+                    <p className="text-sm text-muted-foreground">
+                      ნახეთ თქვენი პროფილი სხვების თვალთახედვით
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="p-4 bg-background rounded-lg border">
+                      <p className="text-sm text-muted-foreground mb-2">თქვენი ფეიჯის ბმული:</p>
+                      <div className="flex items-center gap-2 p-2 bg-muted rounded">
+                        <span className="text-sm font-mono truncate flex-1">
+                          /{userData?.username || firstName?.toLowerCase() || 'user'}
+                        </span>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            const username = userData?.username || firstName?.toLowerCase() || 'user'
+                            navigator.clipboard.writeText(`/${username}`)
+                            toast({
+                              title: "ბმული დაკოპირდა",
+                              description: "ბმული წარმატებით დაკოპირდა ბუფერში"
+                            })
+                          }}
+                        >
+                          კოპირება
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      asChild
+                      className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-medium"
+                    >
+                      <a href={`/${userData?.username || firstName?.toLowerCase() || 'user'}`} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        გახსნა ახალ ფანჯარაში
+                      </a>
+                    </Button>
+                    
+                    <div className="text-xs text-muted-foreground">
+                      <p>შენიშვნა: ფეიჯის გასახსნელად საჭიროა პროფილის მინიმალური ინფორმაციის დამატება</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
       case 'security':
         return (
           <div className="max-w-md mx-auto mt-6 px-4">
@@ -352,14 +415,19 @@ export default function Dashboard() {
                       handleMenuClick(item)
                       setIsSidebarOpen(false)
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      activeSection === item.id && item.id !== 'logout'
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      item.id === 'mypage'
+                        ? 'bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                        : activeSection === item.id && item.id !== 'logout'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
+                    <Icon className={`w-5 h-5 ${item.id === 'mypage' ? 'text-white' : ''}`} />
+                    <span className={`font-medium ${item.id === 'mypage' ? 'text-white' : ''}`}>{item.label}</span>
+                    {item.id === 'mypage' && (
+                      <ExternalLink className="w-4 h-4 ml-auto text-white/80" />
+                    )}
                   </button>
                 )
               })}
