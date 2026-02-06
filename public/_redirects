@@ -1,6 +1,1 @@
-# Netlify redirects for React SPA
-# Handle assets first
-/assets/*  200
-
-# Then fallback to index.html for all other routes
 /*    /index.html   200
