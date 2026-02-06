@@ -328,6 +328,27 @@ export class UserModel {
     }
   }
 
+  static async updateAccessKey(clerkId, accessKey) {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ accesskey: accessKey })
+        .eq('clerk_id', clerkId)
+        .select()
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error updating access key:', error);
+        throw error;
+      }
+      
+      return mapDataToFrontend(data);
+    } catch (error) {
+      console.error('Supabase error:', error.message);
+      throw error;
+    }
+  }
+
   static async update(userId, updateData, clerkToken = null) {
     try {
       // Use regular client since RLS is disabled

@@ -83,6 +83,6 @@
   outline: none !important;
 }
 
-*:hover{
+*:focus{
   outline: none !important;
 }

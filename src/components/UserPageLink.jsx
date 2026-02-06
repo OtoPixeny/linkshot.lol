@@ -1,6 +1,5 @@
 "use client";
 
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useUser } from "@clerk/clerk-react";
@@ -40,12 +39,14 @@ export default function UserPageLink() {
           <AlertTitle>შენი სოციალ ფეიჯი</AlertTitle>
           <AlertDescription>
             თქვენი სოციალ ფეიჯის ბმული:{" "}
-            <Link
-              to={`/${username}`}
+            <a
+              href={`/${username}`}
               className="link-my text-primary hover:underline font-medium"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {window.location.origin}/{username}
-            </Link>
+            </a>
           </AlertDescription>
         </Alert>
       )}

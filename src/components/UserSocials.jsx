@@ -9,7 +9,7 @@ import { Loader } from "@/components/ui/loader";
 import { Icons } from "@/components/icons";
 import UserModel from "../models/user";
 import CustomLinkModel from "../models/customLink";
-import { Share2, Eye } from "lucide-react";
+import { Share2, Eye, Shield } from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
 import Footer from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -90,6 +90,7 @@ export default function UserSocials({ userDataName }) {
         
         if (userData) {
           console.log('User data loaded for:', username);
+          console.log('AccessKey found:', userData.accessKey);
           setImage(userData.avatar_url || userData.image);
           setName(userData.name);
           setBio(userData.bio);
@@ -229,7 +230,7 @@ export default function UserSocials({ userDataName }) {
 
   return (
     <div className="relative px-6 md:px-20 lg:px-32 py-20 grid place-content-center min-h-screen">
-      <div className="absolute top-0 z-[-2] w-full h-full dark:bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+      <div className={`absolute top-0 z-[-2] w-full h-full dark:bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] ${links?.accessKey && !showPrivate ? 'blur-[50px]' : ''}`}></div>
       <div className="fixed top-5 right-5 md:top-10 md:right-32 flex gap-2">
         <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 rounded-full border">
           <Eye className="w-4 h-4" />
@@ -338,6 +339,48 @@ export default function UserSocials({ userDataName }) {
 
       {!loading && !notFound && (
         <div className="mt-10 flex flex-col items-center gap-3">
+          {/* Debug info */}
+          {console.log('Password protection check:', {
+            hasAccessKey: !!links?.accessKey,
+            accessKey: links?.accessKey,
+            showPrivate: showPrivate
+          })}
+          
+          {/* Check if profile is password protected */}
+          {links?.accessKey && !showPrivate ? (
+            <div className="w-full max-w-md mx-auto mt-20">
+              <Card className="text-center">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    პროფილი დაცულია
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    ეს პროფილი დაცულია 4 სიმბოლოიანი პაროლით
+                  </p>
+                  <div className="space-y-3">
+                    <Input
+                      type="password"
+                      value={inputKey}
+                      onChange={(e) => setInputKey(e.target.value.slice(0, 4))}
+                      placeholder="შეიყვანეთ პაროლი"
+                      maxLength={4}
+                      className="text-center text-lg tracking-widest"
+                    />
+                    <Button onClick={handleInput} className="w-full" disabled={inputKey.length !== 4}>
+                      შესვლა
+                    </Button>
+                    {accessError && (
+                      <p className="text-red-500 text-sm mt-2">არასწორი პაროლი</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <>
           {/* Check if any links exist */}
           {Object.entries(links || {}).filter(([key, value]) => {
             return (social.includes(key) || proffesional.includes(key) || creative.includes(key) || 
@@ -496,45 +539,8 @@ export default function UserSocials({ userDataName }) {
                 </Button>
               );
             })}
-
-          {links?.accessKey && (
-            <div className="border mt-10 px-4 py-3 rounded-lg mx-auto max-w-[420px]">
-              <p className="text-sm text-foreground/80 mb-2">Private Links</p>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={inputKey}
-                  onChange={(e) => setInputKey(e.target.value)}
-                  placeholder="Enter Access Key"
-                />
-                <Button onClick={handleInput}>Unlock</Button>
-              </div>
-              {accessError && (
-                <p className="text-red-500 text-sm mt-2">Invalid Access Key</p>
-              )}
-              {showPrivate && (
-                <div className="mt-4 grid gap-3">
-                  {Object.entries(links || {})
-                    .filter(([key, value]) => miscellaneous.includes(key) && value && (typeof value === "string" || typeof value === "number") && String(value).trim() !== "")
-                    .map(([key, value]) => {
-                      const Icon = getIcon(key);
-                      return (
-                        <Button
-                          key={key}
-                          asChild
-                          variant="outline"
-                          className="w-full max-w-[420px] mx-auto justify-start gap-3 h-12 rounded-[15px]"
-                        >
-                          <a href={generateSocialUrl(key, String(value))} target="_blank" rel="noopener noreferrer">
-                            {Icon && <Icon className="w-6 h-6" />}
-                            {key.charAt(0).toUpperCase() + key.slice(1)}
-                          </a>
-                        </Button>
-                      );
-                    })}
-                </div>
-              )}
-            </div>
-          )}
+          </>
+        )}
         </div>
       )}
       {notFound && (
@@ -560,6 +566,48 @@ export default function UserSocials({ userDataName }) {
             >
               <a href="/">← უკან დაბრუნება</a>
             </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Password Protection Overlay */}
+      {links?.accessKey && !showPrivate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-md">
+          <div className="w-full max-w-md mx-auto p-6">
+            <Card className="text-center shadow-2xl border-0 bg-background/95 backdrop-blur-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-center gap-2 text-xl">
+                  <Shield className="w-6 h-6 text-blue-600" />
+                  პროფილი დაცულია
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-6">
+                  ეს პროფილი დაცულია 4 სიმბოლოიანი პაროლით
+                </p>
+                <div className="space-y-4">
+                  <Input
+                    type="password"
+                    value={inputKey}
+                    onChange={(e) => setInputKey(e.target.value.slice(0, 4))}
+                    placeholder="შეიყვანეთ პაროლი"
+                    maxLength={4}
+                    className="text-center text-xl tracking-widest h-12 text-lg font-mono"
+                    autoFocus
+                  />
+                  <Button 
+                    onClick={handleInput} 
+                    className="w-full h-12 text-base font-medium" 
+                    disabled={inputKey.length !== 4}
+                  >
+                    შესვლა
+                  </Button>
+                  {accessError && (
+                    <p className="text-red-500 text-sm mt-2 animate-pulse">არასწორი პაროლი</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}

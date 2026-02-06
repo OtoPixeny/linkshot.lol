@@ -1,18 +1,20 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://i.imgur.com/D3uUyjV.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>linkshot.lol</title>
-    <script type="module" crossorigin src="/assets/index-BuSWxJVE.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/router-3Xi-hXti.js">
-    <link rel="modulepreload" crossorigin href="/assets/clerk-ChZeNCBc.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-D5D4wkCY.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="https://i.imgur.com/D3uUyjV.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>linkshot.lol</title>
+  <script type="module" crossorigin src="/assets/index-DVBlTQLv.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/router-BOPp_ggg.js">
+  <link rel="modulepreload" crossorigin href="/assets/clerk-D-DYsX-Z.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-CSJr6dqn.css">
+</head>
+
+<body>
+  <div id="root"></div>
+</body>
 
 <!-- <script>
     window.__lc = window.__lc || {};
@@ -23,5 +25,97 @@
 </script>
 <noscript><a href="https://www.livechat.com/chat-with/19488818/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript> -->
 
+
+<!-- <script>
+  (function () { var w = window; if (w.ChannelIO) { return w.console.error("ChannelIO script included twice."); } var ch = function () { ch.c(arguments); }; ch.q = []; ch.c = function (args) { ch.q.push(args); }; w.ChannelIO = ch; function l() { if (w.ChannelIOInitialized) { return; } w.ChannelIOInitialized = true; var s = document.createElement("script"); s.type = "text/javascript"; s.async = true; s.src = "https://cdn.channel.io/plugin/ch-plugin-web.js"; var x = document.getElementsByTagName("script")[0]; if (x.parentNode) { x.parentNode.insertBefore(s, x); } } if (document.readyState === "complete") { l(); } else { w.addEventListener("DOMContentLoaded", l); w.addEventListener("load", l); } })();
+
+  ChannelIO('boot', {
+    "pluginKey": "4b853b71-d4e2-410c-9207-2334c904be87"
+  });
+</script> -->
+
+
+<!-- Start of LiveChat (www.livechat.com) code -->
+<script>
+    window.__lc = window.__lc || {};
+    window.__lc.license = 19488818;
+    window.__lc.integration_name = "manual_onboarding";
+    window.__lc.product_name = "livechat";
+    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+</script>
+<noscript><a href="https://www.livechat.com/chat-with/19488818/" rel="nofollow">Chat with us</a></noscript>
+<!-- End of LiveChat code -->
+
+<style>
+    /* Hide LiveChat "Powered by" text - more aggressive approach */
+    [data-testid="powered-by"],
+    .lc-1h8y5rm,
+    div[class*="powered"],
+    a[href*="livechat.com"],
+    .lc-chat-powered-by,
+    .lc-1t0r1w4,
+    .lc-1t0r1w4.lc-1t0r1w4,
+    [class*="lc-"][class*="powered"],
+    [class*="lc-"][class*="brand"],
+    div[class*="lc-"]:has(a[href*="livechat"]),
+    span:contains("Powered"),
+    span:contains("LiveChat") {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+    }
+</style>
+
+<script>
+    // More aggressive approach to hide LiveChat branding
+    function hideLiveChatBranding() {
+        const selectors = [
+            '[class*="powered"]',
+            '[class*="lc-"]',
+            'a[href*="livechat"]',
+            '[data-testid*="powered"]',
+            'span',
+            'div',
+            'a'
+        ];
+        
+        selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                const text = el.textContent || el.innerText || '';
+                if (text.includes('Powered') || text.includes('LiveChat') || text.includes('powered')) {
+                    el.style.display = 'none';
+                    el.style.visibility = 'hidden';
+                    el.style.opacity = '0';
+                    el.style.height = '0';
+                    el.style.width = '0';
+                    el.style.overflow = 'hidden';
+                    el.remove();
+                }
+            });
+        });
+    }
+
+    // Run immediately and then observe for changes
+    hideLiveChatBranding();
+    
+    // Use MutationObserver to catch dynamically added elements
+    const observer = new MutationObserver((mutations) => {
+        hideLiveChatBranding();
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+    });
+    
+    // Also run periodically as backup
+    setInterval(hideLiveChatBranding, 500);
+</script>
 
 </html>

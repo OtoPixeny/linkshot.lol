@@ -56,7 +56,7 @@ export default function Hero() {
       <div className="border mb-4 w-fit mx-auto py-1.5 px-3 rounded-full bg-background">
           <p className="text-xs flex items-center justify-center gap-1">
             <StarsIcon className="h-4 w-4" />
-            LinkShot ბეტა ვერსია V1.0.1
+            LinkShot ვერსია V1.0.1
             <ArrowRight className="h-4 w-4" />
           </p>
       </div>
