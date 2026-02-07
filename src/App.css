@@ -856,3 +856,13 @@
     margin-top: 1rem !important;
   }
 }
+
+
+.dark .sidebar{
+  color: #000000 !important;
+}
+
+
+.music-card{
+  display: none !important;
+}

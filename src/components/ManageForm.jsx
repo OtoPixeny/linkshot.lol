@@ -43,6 +43,7 @@ export default function ManageForm() {
   const [soundcloud, setSoundcloud] = useState("");
   const [spotify, setSpotify] = useState("");
   const [applemusic, setApplemusic] = useState("");
+  const [music, setMusic] = useState("");
   const [discord, setDiscord] = useState("");
   const [telegram, setTelegram] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -89,6 +90,7 @@ export default function ManageForm() {
             setSoundcloud(userData.soundcloud || "");
             setSpotify(userData.spotify || "");
             setApplemusic(userData["apple music"] || "");
+            setMusic(userData.music || "");
             setDiscord(userData.discord || "");
             setTelegram(userData.telegram || "");
             setWhatsapp(userData.whatsapp || "");
@@ -148,6 +150,7 @@ export default function ManageForm() {
       soundcloud,
       spotify,
       "apple music": applemusic,
+      music,
       discord,
       telegram,
       whatsapp,
@@ -190,6 +193,7 @@ export default function ManageForm() {
         soundcloud,
         spotify,
         "apple music": applemusic,
+        music,
         discord,
         telegram,
         whatsapp,
@@ -472,6 +476,15 @@ export default function ManageForm() {
                 value={applemusic}
                 onChange={(e) => setApplemusic(e.target.value)}
                 placeholder="Apple Music profile"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="music">მუსიკის URL</Label>
+              <Input
+                id="music"
+                value={music}
+                onChange={(e) => setMusic(e.target.value)}
+                placeholder="მუსიკის ბმული (YouTube, SoundCloud ან სხვა)"
               />
             </div>
           </div>

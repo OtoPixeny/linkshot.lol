@@ -77,6 +77,9 @@ export const userSchema = new mongoose.Schema({
   applemusic: {
     type: String,
   },
+  music: {
+    type: String,
+  },
   discord: {
     type: String,
   },

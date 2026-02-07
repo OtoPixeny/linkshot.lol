@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import ManageForm from '@/components/ManageForm'
+import MusicManager from '@/components/MusicManager'
 import UserManagement from '@/components/UserManagement'
 import UserPageLink from '@/components/UserPageLink'
 import { useUser } from "@clerk/clerk-react"
-import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink, BarChart3, Users } from "lucide-react"
+import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink, BarChart3, Users, Music } from "lucide-react"
 import UserModel from "@/models/user"
 import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/components/ui/use-toast"
@@ -52,7 +53,7 @@ export default function Dashboard() {
   const menuItems = useMemo(() => [
     { id: 'profile', label: 'პროფილი', icon: User },
     { id: 'security', label: 'უსაფრთხოება', icon: Shield },
-    { id: 'analytics', label: 'ანალისტიკა', icon: BarChart3 },
+    { id: 'music', label: 'მუსიკა', icon: Music },
     ...(hasAdminPermissions() ? [{ id: 'users', label: 'ანგარიშები', icon: Users }] : []),
     { id: 'logout', label: 'გასვლა', icon: LogOut },
     { id: 'mypage', label: 'ჩემი ფეიჯი', icon: ExternalLink },
@@ -225,6 +226,8 @@ export default function Dashboard() {
             <ManageForm />
           </>
         )
+      case 'music':
+        return <MusicManager />
       case 'links':
         return (
           <div className="flex items-center justify-center h-full">
@@ -642,16 +645,16 @@ export default function Dashboard() {
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       item.id === 'mypage'
-                        ? 'bg-black text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] border border-black/10 dark:bg-white dark:text-black dark:border-white/10'
+                        ? 'bg-primary text-primary-foreground shadow-md hover:shadow-lg transform hover:scale-[1.02]'
                         : activeSection === item.id && item.id !== 'logout'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <Icon className={`w-6 h-6 ${item.id === 'mypage' ? 'text-white' : ''}`} />
-                    <span className={`font-medium ${item.id === 'mypage' ? 'text-white' : ''}`}>{item.label}</span>
+                    <Icon className="w-6 h-6" />
+                    <span className="font-medium">{item.label}</span>
                     {item.id === 'mypage' && (
-                      <ExternalLink className="w-4 h-4 ml-auto text-white/80" />
+                      <ExternalLink className="w-4 h-4 ml-auto" />
                     )}
                   </button>
                 )

@@ -9,7 +9,7 @@ import { Loader } from "@/components/ui/loader";
 import { Icons } from "@/components/icons";
 import UserModel from "../models/user";
 import CustomLinkModel from "../models/customLink";
-import { Share2, Eye, Shield } from "lucide-react";
+import { Share2, Eye, Shield, X, Music, Play, Pause, Volume2 } from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
 import Footer from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
@@ -71,10 +71,84 @@ export default function UserSocials({ userDataName }) {
   const [showFullBio, setShowFullBio] = useState(false);
   const [rank, setRank] = useState("მომხმარებელი");
   const [rankData, setRankData] = useState([{ icon: getRankIcon("მომხმარებელი"), name: "მომხმარებელი" }]);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [avatarColors, setAvatarColors] = useState({ dominant: '#6366f1', secondary: '#a855f7' });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [audioRef, setAudioRef] = useState(null);
 
   const handleLinkClick = (linkType, url) => {
     trackClick(userDataName, linkType);
     window.open(url, '_blank');
+  };
+
+  const handleMusicPlayPause = (trackUrl, trackType) => {
+    if (currentTrack === trackUrl && isPlaying) {
+      // Pause current track
+      if (audioRef) {
+        audioRef.pause();
+      }
+      setIsPlaying(false);
+      setCurrentTrack(null);
+    } else {
+      // Play new track
+      if (audioRef) {
+        audioRef.pause();
+      }
+      
+      const audio = new Audio();
+      audio.src = getDirectAudioUrl(trackUrl, trackType);
+      audio.play().then(() => {
+        setAudioRef(audio);
+        setIsPlaying(true);
+        setCurrentTrack(trackUrl);
+        trackClick(userDataName, 'music_play');
+      }).catch(error => {
+        console.error('Error playing audio:', error);
+        // Fallback to opening in new tab
+        window.open(trackUrl, '_blank');
+      });
+      
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setCurrentTrack(null);
+      });
+    }
+  };
+
+  const getDirectAudioUrl = (url, type) => {
+    // For YouTube, we'll use the embed URL for better compatibility
+    if (type === 'youtube') {
+      return getMusicEmbedUrl(url);
+    }
+    
+    // For Spotify and other platforms, return original URL
+    // Note: Direct audio playback from Spotify requires API integration
+    // For now, we'll use the original URL
+    return url;
+  };
+
+  const getMusicEmbedUrl = (url) => {
+    if (!url) return null;
+    
+    // YouTube URL conversion
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1]?.split('&')[0];
+      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : null;
+    }
+    
+    // YouTube short URL
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : null;
+    }
+    
+    // SoundCloud embed
+    if (url.includes('soundcloud.com')) {
+      return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=true`;
+    }
+    
+    return url;
   };
 
   const handleInput = () => {
@@ -87,6 +161,63 @@ export default function UserSocials({ userDataName }) {
       setAccessError(true);
       setShowPrivate(false);
     }
+  };
+
+  // Extract colors from avatar image
+  const extractAvatarColors = (imageUrl) => {
+    if (!imageUrl) return;
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Sample from center area of image
+      const sampleSize = 50;
+      canvas.width = sampleSize;
+      canvas.height = sampleSize;
+      
+      const sourceSize = Math.min(img.width, img.height) * 0.3;
+      const sourceX = (img.width - sourceSize) / 2;
+      const sourceY = (img.height - sourceSize) / 2;
+      
+      ctx.drawImage(img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, sampleSize, sampleSize);
+      
+      const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
+      const data = imageData.data;
+      
+      let r = 0, g = 0, b = 0;
+      let pixelCount = 0;
+      
+      // Sample pixels and calculate average
+      for (let i = 0; i < data.length; i += 4) {
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        pixelCount++;
+      }
+      
+      r = Math.floor(r / pixelCount);
+      g = Math.floor(g / pixelCount);
+      b = Math.floor(b / pixelCount);
+      
+      // Convert to hex and create complementary colors
+      const dominant = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+      
+      // Create a lighter, more vibrant version for secondary
+      const secondary = `#${Math.min(255, r + 40).toString(16).padStart(2, '0')}${Math.min(255, g + 40).toString(16).padStart(2, '0')}${Math.min(255, b + 40).toString(16).padStart(2, '0')}`;
+      
+      setAvatarColors({ dominant, secondary });
+    };
+    
+    img.onerror = () => {
+      // Fallback to default colors
+      setAvatarColors({ dominant: '#6366f1', secondary: '#a855f7' });
+    };
+    
+    img.src = imageUrl;
   };
 
   useEffect(() => {
@@ -107,6 +238,12 @@ export default function UserSocials({ userDataName }) {
           const data = getAllRankData(userData.rank || "მომხმარებელი");
           setRankData(data);
           console.log('User rank:', userData.rank, 'Rank data:', data);
+          
+          // Extract colors from avatar
+          const avatarUrl = userData.avatar_url || userData.image;
+          if (avatarUrl) {
+            extractAvatarColors(avatarUrl);
+          }
           
           // Check if user is in top 3
           // Intro disabled for top 3 users
@@ -237,7 +374,12 @@ export default function UserSocials({ userDataName }) {
 
   return (
     <div className="relative px-6 md:px-20 lg:px-32 py-20 grid place-content-center min-h-screen">
-      <div className={`absolute top-0 z-[-2] w-full h-full dark:bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] ${links?.accessKey && !showPrivate ? 'blur-[50px]' : ''}`}></div>
+      <div 
+        className={`absolute top-0 z-[-2] w-full h-full dark:bg-neutral-950 ${links?.accessKey && !showPrivate ? 'blur-[50px]' : ''}`}
+        style={{
+          background: `radial-gradient(ellipse 80% 80% at 50% -20%, ${avatarColors.dominant}39, ${avatarColors.secondary}38, rgba(255,255,255,0))`
+        }}
+      ></div>
       <div className="fixed top-5 right-5 md:top-10 md:right-32 flex gap-2">
         <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 rounded-full border">
           <Eye className="w-4 h-4" />
@@ -281,7 +423,7 @@ export default function UserSocials({ userDataName }) {
         {loading && <div className="relative w-24 h-24"><Loader /></div>}
         
         {!loading && !notFound && image && (
-          <div className="avatar-user rounded-full overflow-hidden">
+          <div className="avatar-user rounded-full overflow-hidden cursor-pointer transform transition-all duration-200 hover:scale-105 hover:shadow-lg" onClick={() => setShowAvatarModal(true)}>
             <img 
               src={image} 
               alt={name || 'User'} 
@@ -388,6 +530,102 @@ export default function UserSocials({ userDataName }) {
             </div>
           ) : (
             <>
+          {/* Music Player */}
+          {(links.music || links.spotify) && (
+            <div className="w-full max-w-[420px] mb-[-30px]">
+              <Card className="music-card bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200 dark:border-purple-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Music className="w-5 h-5 text-purple-600" />
+                    <h3 className="font-medium text-purple-700 dark:text-purple-300">მუსიკა</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* YouTube Music Player */}
+                    {links.music && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          YouTube
+                        </div>
+                        
+                        {/* Embedded YouTube Player */}
+                        <div className="relative w-full h-48 rounded-lg overflow-hidden bg-black">
+                          <iframe
+                            src={getMusicEmbedUrl(links.music)}
+                            className="absolute top-0 left-0 w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                        
+                        {/* Fallback Play Button */}
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleLinkClick('music', links.music)}
+                            className="flex items-center gap-2 border-red-200 hover:border-red-400 dark:border-red-800"
+                          >
+                            <Play className="w-4 h-4" />
+                            ახალ ფანჯარაში
+                          </Button>
+                          <span className="text-xs text-muted-foreground">
+                            თუ პლეერი არ იმუშავებს
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Spotify Player */}
+                    {links.spotify && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          Spotify
+                        </div>
+                        
+                        {/* Spotify Embed Player */}
+                        <div className="relative w-full h-32 rounded-lg overflow-hidden bg-black">
+                          <iframe
+                            src={`https://open.spotify.com/embed${links.spotify.includes('track') ? '/track' : links.spotify.includes('playlist') ? '/playlist' : '/'}${links.spotify.split('/').pop()}`}
+                            className="absolute top-0 left-0 w-full h-full"
+                            allow="encrypted-media"
+                            frameBorder="0"
+                            allowtransparency="true"
+                          />
+                        </div>
+                        
+                        {/* Fallback Play Button */}
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleLinkClick('spotify', links.spotify)}
+                            className="flex items-center gap-2 border-green-200 hover:border-green-400 dark:border-green-800"
+                          >
+                            <Play className="w-4 h-4" />
+                            Spotify აპლიკაციაში
+                          </Button>
+                          <span className="text-xs text-muted-foreground">
+                            თუ პლეერი არ იმუშავებს
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Instructions */}
+                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                      🎵 მუსიკა იკვრება პირდაპირ საიტზე! თუ პლეერი არ ჩანს, გამოიყენეთ ღილაკები.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {/* Check if any links exist */}
           {Object.entries(links || {}).filter(([key, value]) => {
             return (social.includes(key) || proffesional.includes(key) || creative.includes(key) || 
@@ -550,6 +788,35 @@ export default function UserSocials({ userDataName }) {
             >
               <a href="/">← უკან დაბრუნება</a>
             </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Avatar Modal */}
+      {showAvatarModal && image && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowAvatarModal(false)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] p-8">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAvatarModal(false);
+              }}
+              className="absolute top-0 right-0 text-gray-500 hover:text-gray-300 transition-colors duration-200"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={image} 
+              alt={name || 'User'} 
+              className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-xl animate-in zoom-in duration-200"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="text-center mt-4">
+              <p className="text-gray-400 text-sm font-medium">{name || 'User'}</p>
+            </div>
           </div>
         </div>
       )}
