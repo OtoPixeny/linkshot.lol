@@ -4,16 +4,19 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import ManageForm from '@/components/ManageForm'
+import UserManagement from '@/components/UserManagement'
 import UserPageLink from '@/components/UserPageLink'
 import { useUser } from "@clerk/clerk-react"
-import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink } from "lucide-react"
+import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink, BarChart3, Users } from "lucide-react"
 import UserModel from "@/models/user"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { useAnalytics } from "@/hooks/useAnalytics"
 
 export default function Dashboard() {
   const { user, signOut } = useUser()
   const { toast } = useToast()
+  const { analytics, loading: analyticsLoading, error: analyticsError, refetch: refetchAnalytics } = useAnalytics()
   const [isUpdatingRanks, setIsUpdatingRanks] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('profile')
@@ -22,6 +25,12 @@ export default function Dashboard() {
   const [isSettingPassword, setIsSettingPassword] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [userData, setUserData] = useState(null)
+
+  // Helper function to check if user has admin/moderator permissions
+  const hasAdminPermissions = () => {
+    const userRank = userData?.rank || ''
+    return userRank.includes('ადმინისტრატორი') || userRank.includes('მოდერატორი')
+  }
 
   // Load current access key and user data on component mount
   useEffect(() => {
@@ -39,6 +48,15 @@ export default function Dashboard() {
     
     loadUserData()
   }, [user?.id])
+
+  const menuItems = useMemo(() => [
+    { id: 'profile', label: 'პროფილი', icon: User },
+    { id: 'security', label: 'უსაფრთხოება', icon: Shield },
+    { id: 'analytics', label: 'ანალისტიკა', icon: BarChart3 },
+    ...(hasAdminPermissions() ? [{ id: 'users', label: 'ანგარიშები', icon: Users }] : []),
+    { id: 'logout', label: 'გასვლა', icon: LogOut },
+    { id: 'mypage', label: 'ჩემი ფეიჯი', icon: ExternalLink },
+  ], [userData])
   
   if (!user) {
     return (
@@ -54,13 +72,6 @@ export default function Dashboard() {
   const fullName = `${firstName || ''} ${lastName || ''}`.trim() || firstName || 'User'
   const email = emailAddresses[0]?.emailAddress
   const clerkUserId = user.id
-
-  const menuItems = [
-    { id: 'profile', label: 'პროფილი', icon: User },
-    { id: 'security', label: 'უსაფრთხოება', icon: Shield },
-    { id: 'logout', label: 'გასვლა', icon: LogOut },
-    { id: 'mypage', label: 'ჩემი ფეიჯი', icon: ExternalLink },
-  ]
 
   const handleUpdateRanks = async () => {
     setIsUpdatingRanks(true)
@@ -184,7 +195,7 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <Card className="admin-card mb-6">
+            {/* <Card className="admin-card mb-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Crown className="w-5 h-5" />
@@ -209,7 +220,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
             
             <ManageForm />
           </>
@@ -222,10 +233,224 @@ export default function Dashboard() {
         )
       case 'analytics':
         return (
-          <div className="flex items-center justify-center h-full">
-            <h2 className="text-2xl font-bold">ანალიტიკა</h2>
+          <div className="max-w-6xl mx-auto mt-6 px-4">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2">ანალისტიკა</h2>
+              <p className="text-muted-foreground">თქვენი პროფილის მონაცემები და სტატისტიკა</p>
+            </div>
+            
+            {analyticsLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="relative w-12 h-12">
+                  <Loader />
+                </div>
+              </div>
+            ) : analyticsError ? (
+              <Card className="border-red-200 bg-red-50 dark:bg-red-900/10">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <p className="text-red-600 dark:text-red-400">ანალისტიკის ჩატვირთვა ვერ მოხერხდა</p>
+                    <Button 
+                      onClick={refetchAnalytics} 
+                      variant="outline" 
+                      className="mt-2"
+                    >
+                      თავიდან ცდა
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : analytics ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">პროფილის ნახვები</p>
+                          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{analytics.profileViews.toLocaleString()}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
+                          <User className="w-6 h-6 text-blue-600" />
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                        სულ {analytics.monthlyViews.toLocaleString()} თვეში
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-green-600 dark:text-green-400 font-medium">ბმულების კლიკები</p>
+                          <p className="text-2xl font-bold text-green-700 dark:text-green-300">{analytics.monthlyClicks.toLocaleString()}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center">
+                          <ExternalLink className="w-6 h-6 text-green-600" />
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-green-600 dark:text-green-400">
+                        კონვერსია {analytics.profileViews > 0 ? Math.round((analytics.monthlyClicks / analytics.profileViews) * 100) : 0}%
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">რანგი</p>
+                          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">#{analytics.rank}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center">
+                          <Crown className="w-6 h-6 text-purple-600" />
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-purple-600 dark:text-purple-400">
+                        {analytics.totalUsers.toLocaleString()} მომხმარებლიდან
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">აქტიურობა</p>
+                          <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">{analytics.activityScore}%</p>
+                        </div>
+                        <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center">
+                          <BarChart3 className="w-6 h-6 text-orange-600" />
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-orange-600 dark:text-orange-400">
+                        {analytics.activityScore >= 80 ? 'ძალიან კარგი' : analytics.activityScore >= 50 ? 'კარგი' : 'ნორმალური'}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5" />
+                        ელემენტების პოპულარობა
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {Object.entries(analytics.linkPopularity).length > 0 ? (
+                          Object.entries(analytics.linkPopularity)
+                            .sort(([,a], [,b]) => b - a)
+                            .slice(0, 6)
+                            .map(([linkType, count]) => {
+                              const percentage = analytics.monthlyClicks > 0 ? 
+                                Math.round((count / analytics.monthlyClicks) * 100) : 0;
+                              const colors = {
+                                instagram: 'bg-pink-500',
+                                youtube: 'bg-red-500',
+                                tiktok: 'bg-black',
+                                facebook: 'bg-blue-600',
+                                twitter: 'bg-sky-500',
+                                github: 'bg-gray-800'
+                              };
+                              const color = colors[linkType.toLowerCase()] || 'bg-gray-500';
+                              
+                              return (
+                                <div key={linkType} className="flex items-center justify-between">
+                                  <span className="text-sm font-medium capitalize">{linkType}</span>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                      <div className={`${color} h-2 rounded-full`} style={{width: `${percentage}%`}}></div>
+                                    </div>
+                                    <span className="text-sm text-gray-600">{count}</span>
+                                  </div>
+                                </div>
+                              );
+                            })
+                        ) : (
+                          <p className="text-sm text-muted-foreground">ჯერ არაა კლიკების მონაცემები</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Calendar className="w-5 h-5" />
+                        თვის სტატისტიკა
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">საშუალო დღიური ნახვები</span>
+                          <span className="font-semibold">{analytics.avgDailyViews}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">საშუალო დღიური კლიკები</span>
+                          <span className="font-semibold">{analytics.avgDailyClicks}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">სულ ნახვები</span>
+                          <span className="font-semibold">{analytics.profileViews.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">სულ კლიკები</span>
+                          <span className="font-semibold">{analytics.monthlyClicks.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <RefreshCw className="w-5 h-5" />
+                      ბოლო აქტივობები
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {analytics.recentActivity.length > 0 ? (
+                        analytics.recentActivity.slice(0, 10).map((activity, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2 h-2 rounded-full ${
+                                activity.type === 'profile_view' ? 'bg-green-500' : 'bg-blue-500'
+                              }`}></div>
+                              <div>
+                                <p className="text-sm font-medium">
+                                  {activity.type === 'profile_view' ? 'პროფილი ნახეს' : 
+                                   `${activity.linkType || 'ბმულზე'} დაკლიკეს`}
+                                </p>
+                                <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
+                              </div>
+                            </div>
+                            <span className="text-sm text-gray-600">
+                              {activity.ipAddress ? activity.ipAddress.substring(0, 8) + '...' : 'N/A'}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          ჯერ არაა აქტივობების მონაცემები
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : null}
           </div>
         )
+      case 'users':
+        return <UserManagement />
       case 'mypage':
         return (
           <div className="max-w-md mx-auto mt-6 px-4">
@@ -417,13 +642,13 @@ export default function Dashboard() {
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       item.id === 'mypage'
-                        ? 'bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                        ? 'bg-black text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] border border-black/10 dark:bg-white dark:text-black dark:border-white/10'
                         : activeSection === item.id && item.id !== 'logout'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 ${item.id === 'mypage' ? 'text-white' : ''}`} />
+                    <Icon className={`w-6 h-6 ${item.id === 'mypage' ? 'text-white' : ''}`} />
                     <span className={`font-medium ${item.id === 'mypage' ? 'text-white' : ''}`}>{item.label}</span>
                     {item.id === 'mypage' && (
                       <ExternalLink className="w-4 h-4 ml-auto text-white/80" />

@@ -15,6 +15,7 @@ import Footer from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { UserAvatar } from "@/components/user-avatar";
 import { useToast } from "@/components/ui/use-toast";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 // Lazy load icons only when needed
 const getIcon = (iconName) => {
@@ -52,6 +53,7 @@ export default function UserSocials({ userDataName }) {
   const [loading, setLoading] = useState(true);
   const { user, isSignedIn } = useAuth();
   const { toast } = useToast();
+  const { trackClick } = useAnalytics();
 
   const [image, setImage] = useState("");
   const [bio, setBio] = useState("");
@@ -69,6 +71,11 @@ export default function UserSocials({ userDataName }) {
   const [showFullBio, setShowFullBio] = useState(false);
   const [rank, setRank] = useState("მომხმარებელი");
   const [rankData, setRankData] = useState([{ icon: getRankIcon("მომხმარებელი"), name: "მომხმარებელი" }]);
+
+  const handleLinkClick = (linkType, url) => {
+    trackClick(userDataName, linkType);
+    window.open(url, '_blank');
+  };
 
   const handleInput = () => {
     if (!inputKey) return;
@@ -401,14 +408,12 @@ export default function UserSocials({ userDataName }) {
               return (
                 <Button
                   key={key}
-                  asChild
                   variant="outline"
                   className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
+                  onClick={() => handleLinkClick(key, generateSocialUrl(key, value))}
                 >
-                  <a href={generateSocialUrl(key, value)} target="_blank" rel="noopener noreferrer">
-                    {Icon && <Icon className="w-6 h-6" />}
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </a>
+                  {Icon && <Icon className="w-6 h-6" />}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Button>
               );
             })}
@@ -421,14 +426,12 @@ export default function UserSocials({ userDataName }) {
               return (
                 <Button
                   key={key}
-                  asChild
                   variant="outline"
                   className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
+                  onClick={() => handleLinkClick(key, generateSocialUrl(key, value))}
                 >
-                  <a href={generateSocialUrl(key, value)} target="_blank" rel="noopener noreferrer">
-                    {Icon && <Icon className="w-6 h-6" />}
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </a>
+                  {Icon && <Icon className="w-6 h-6" />}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Button>
               );
             })}
@@ -441,14 +444,12 @@ export default function UserSocials({ userDataName }) {
               return (
                 <Button
                   key={key}
-                  asChild
                   variant="outline"
                   className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
+                  onClick={() => handleLinkClick(key, generateSocialUrl(key, value))}
                 >
-                  <a href={generateSocialUrl(key, value)} target="_blank" rel="noopener noreferrer">
-                    {Icon && <Icon className="w-6 h-6" />}
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </a>
+                  {Icon && <Icon className="w-6 h-6" />}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Button>
               );
             })}
@@ -461,14 +462,12 @@ export default function UserSocials({ userDataName }) {
               return (
                 <Button
                   key={key}
-                  asChild
                   variant="outline"
                   className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
+                  onClick={() => handleLinkClick(key, generateSocialUrl(key, value))}
                 >
-                  <a href={generateSocialUrl(key, value)} target="_blank" rel="noopener noreferrer">
-                    {Icon && <Icon className="w-6 h-6" />}
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </a>
+                  {Icon && <Icon className="w-6 h-6" />}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Button>
               );
             })}
@@ -481,64 +480,49 @@ export default function UserSocials({ userDataName }) {
               return (
                 <Button
                   key={key}
-                  asChild
                   variant="outline"
                   className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
+                  onClick={() => handleLinkClick(key, generateSocialUrl(key, value))}
                 >
-                  <a href={generateSocialUrl(key, value)} target="_blank" rel="noopener noreferrer">
-                    {Icon && <Icon className="w-6 h-6" />}
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </a>
+                  {Icon && <Icon className="w-6 h-6" />}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Button>
               );
             })}
-          
-          {/* Custom Links */}
-          {customLinks.map((link) => {
-            const Icon = getIcon(link.icon);
-            return (
-              <Button
-                key={link.id}
-                asChild
-                variant="outline"
-                className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
-              >
-                <a href={link.url.startsWith('http') ? link.url : `https://${link.url}`} target="_blank" rel="noopener noreferrer">
-                  {Icon && <Icon className="w-6 h-6" />}
-                  {link.title}
-                </a>
-              </Button>
-            );
-          })}
 
           {/* Miscellaneous Links */}
           {Object.entries(links || {})
             .filter(([key, value]) => miscellaneous.includes(key) && value && typeof value === "string" && value.trim() !== "")
             .map(([key, value]) => {
               const Icon = getIcon(key);
-              const isEmail = key === 'email';
               return (
                 <Button
                   key={key}
                   variant="outline"
                   className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
-                  onClick={isEmail ? () => handleEmailClick(value) : undefined}
-                  asChild={!isEmail}
+                  onClick={() => handleLinkClick(key, generateSocialUrl(key, value))}
                 >
-                  {isEmail ? (
-                    <div className="flex items-center gap-3 w-full">
-                      {Icon && <Icon className="w-6 h-6" />}
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </div>
-                  ) : (
-                    <a href={generateSocialUrl(key, value)} target="_blank" rel="noopener noreferrer">
-                      {Icon && <Icon className="w-6 h-6" />}
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </a>
-                  )}
+                  {Icon && <Icon className="w-6 h-6" />}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Button>
               );
             })}
+
+          {/* Custom Links */}
+          {customLinks.map((link) => {
+            const Icon = getIcon("website");
+            return (
+              <Button
+                key={link.id}
+                variant="outline"
+                className="social-link w-full max-w-[420px] justify-start gap-3 h-14 rounded-[15px]"
+                onClick={() => handleLinkClick('custom', link.url)}
+              >
+                {Icon && <Icon className="w-6 h-6" />}
+                {link.title}
+              </Button>
+            );
+          })}
           </>
         )}
         </div>

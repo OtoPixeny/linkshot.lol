@@ -349,6 +349,25 @@ export class UserModel {
     }
   }
 
+  static async getAllUsers() {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, clerk_id, username, name, email, avatar_url, rank, views, created_at')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching all users:', error);
+        throw error;
+      }
+      
+      return data.map(user => mapDataToFrontend(user));
+    } catch (error) {
+      console.error('Supabase error:', error.message);
+      throw error;
+    }
+  }
+
   static async update(userId, updateData, clerkToken = null) {
     try {
       // Use regular client since RLS is disabled

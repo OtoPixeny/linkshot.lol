@@ -282,8 +282,8 @@ export default function ManageForm() {
 
       <Tabs defaultValue="social" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger className="hello" value="social">კლასიკური</TabsTrigger>
-          <TabsTrigger  className="hello" value="professional">პროფესიური</TabsTrigger>
+          <TabsTrigger className="hello" value="social">სოციალური</TabsTrigger>
+          <TabsTrigger  className="hello" value="professional">პროფესიული</TabsTrigger>
           <TabsTrigger  className="hello" value="creative">კრეატიული</TabsTrigger>
           <TabsTrigger  className="hello" value="messaging">სამესიჯო</TabsTrigger>
           <TabsTrigger className="hello"  value="other">სხვა</TabsTrigger>                  
