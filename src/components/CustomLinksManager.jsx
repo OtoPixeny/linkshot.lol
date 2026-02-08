@@ -13,6 +13,7 @@ import CustomLinkModel from "@/models/customLink";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Loader as CustomLoader } from "@/components/ui/loader";
+import { useSuccessSound } from "@/hooks/useSuccessSound";
 
 const availableIcons = [
   { value: "globe", label: "🌐 ვებსაიტი", emoji: "🌐" },
@@ -40,6 +41,7 @@ const availableIcons = [
 export default function CustomLinksManager() {
   const { toast } = useToast();
   const { user } = useUser();
+  const { playSuccessSound } = useSuccessSound();
 
   const [customLinks, setCustomLinks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,6 +95,7 @@ export default function CustomLinksManager() {
     try {
       const result = await CustomLinkModel.create(user.id, newLink);
       if (result) {
+        playSuccessSound(); // Play success sound
         setCustomLinks([...customLinks, result]);
         setNewLink({ title: "", url: "", icon: "globe" });
         setShowAddForm(false);
@@ -118,6 +121,7 @@ export default function CustomLinksManager() {
     try {
       const result = await CustomLinkModel.delete(linkId);
       if (result) {
+        playSuccessSound(); // Play success sound
         setCustomLinks(customLinks.filter(link => link.id !== linkId));
         toast({
           title: "წარმატება",

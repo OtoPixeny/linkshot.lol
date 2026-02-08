@@ -8,16 +8,18 @@ import MusicManager from '@/components/MusicManager'
 import UserManagement from '@/components/UserManagement'
 import UserPageLink from '@/components/UserPageLink'
 import { useUser } from "@clerk/clerk-react"
-import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink, BarChart3, Users, Music } from "lucide-react"
+import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink, BarChart3, Users, Music, Award } from "lucide-react"
 import UserModel from "@/models/user"
 import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { useAnalytics } from "@/hooks/useAnalytics"
+import { useSuccessSound } from "@/hooks/useSuccessSound"
 
 export default function Dashboard() {
   const { user, signOut } = useUser()
   const { toast } = useToast()
   const { analytics, loading: analyticsLoading, error: analyticsError, refetch: refetchAnalytics } = useAnalytics()
+  const { playSuccessSound } = useSuccessSound()
   const [isUpdatingRanks, setIsUpdatingRanks] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('profile')
@@ -54,8 +56,8 @@ export default function Dashboard() {
     { id: 'profile', label: 'პროფილი', icon: User },
     { id: 'security', label: 'უსაფრთხოება', icon: Shield },
     { id: 'music', label: 'მუსიკა', icon: Music },
+    { id: 'badges', label: 'ბეიჯები', icon: Award },
     ...(hasAdminPermissions() ? [{ id: 'users', label: 'ანგარიშები', icon: Users }] : []),
-    { id: 'logout', label: 'გასვლა', icon: LogOut },
     { id: 'mypage', label: 'ჩემი ფეიჯი', icon: ExternalLink },
   ], [userData])
   
@@ -78,6 +80,7 @@ export default function Dashboard() {
     setIsUpdatingRanks(true)
     try {
       const result = await UserModel.updateRanksForTopUsers()
+      playSuccessSound(); // Play success sound
       toast({
         title: "რანკები განახლდა",
         description: `ტოპ 3 მომხმარებლის რანკები წარმატებით განახლდა`,
@@ -117,6 +120,7 @@ export default function Dashboard() {
       setCurrentPassword(newPassword)
       setNewPassword('')
       setShowPasswordForm(false)
+      playSuccessSound(); // Play success sound
       toast({
         title: "წარმატება",
         description: "პაროლი წარმატებით დაყენდა",
@@ -137,6 +141,7 @@ export default function Dashboard() {
     try {
       await UserModel.updateAccessKey(clerkUserId, '')
       setCurrentPassword('')
+      playSuccessSound(); // Play success sound
       toast({
         title: "წარმატება",
         description: "პაროლი წაიშალა",
@@ -228,6 +233,93 @@ export default function Dashboard() {
         )
       case 'music':
         return <MusicManager />
+      case 'badges':
+        return (
+          <div className="max-w-6xl mx-auto mt-6 px-4">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2">ჩემი ბეიჯები</h2>
+              <p className="text-muted-foreground">თქვენი მიღწევები და სტატუსები</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[15px]">
+              {(() => {
+                const userRanks = (userData?.rank || 'მომხმარებელი').split(',').map(r => r.trim()).filter(r => r);
+                const getRankIcon = (rank) => {
+                  const rankIcons = {
+                    "მომხმარებელი": "/rank-img/member.png",
+                    "ბუსტერი": "/rank-img/booster.png", 
+                    "ადმინისტრატორი": "/rank-img/administrator.png",
+                    "მოდერატორი": "/rank-img/moderator.png",
+                    "owner": "/rank-img/owner.png",
+                    "მფლობელი": "/rank-img/owner.png",
+                    "sponsor": "/rank-img/sponsor.png",
+                    "სპონსორი": "/rank-img/sponsor.png",
+                    "პარტნიორი": "/rank-img/partner.png"
+                  };
+                  return rankIcons[rank] || rankIcons["მომხმარებელი"];
+                };
+
+                const badgeConfig = {
+                  'მომხმარებელი': { color: 'green', label: 'მომხმარებელი' },
+                  'ადმინისტრატორი': { color: 'blue', label: 'ადმინისტრატორი' },
+                  'მოდერატორი': { color: 'lime', label: 'მოდერატორი' },
+                  'ბუსტერი': { color: 'orange', label: 'ბუსტერი' },
+                  'პარტნიორი': { color: 'orange', label: 'პარტნიორი' },
+                  'სპონსორი': { color: 'pink', label: 'სპონსორი' },
+                  'ვეტერანი': { color: 'red', label: 'ვეტერანი' },
+                  'მფლობელი': { color: 'yellow', label: 'მფლობელი' },
+                  'owner': { color: 'yellow', label: 'owner' }
+                };
+
+                return userRanks.map((rank, index) => {
+                  const config = badgeConfig[rank] || { color: 'indigo', label: rank };
+                  const colorClasses = {
+                    gray: 'border-gray-900 bg-gray-800 hover:bg-gray-900 text-gray-800 stroke-gray-900',
+                    red: 'border-red-900 bg-red-800 hover:bg-red-900 text-red-800 stroke-red-900',
+                    blue: 'border-blue-900 bg-blue-800 hover:bg-blue-900 text-blue-800 stroke-blue-900',
+                    purple: 'border-purple-900 bg-purple-800 hover:bg-purple-900 text-purple-800 stroke-purple-900',
+                    green: 'border-green-900 bg-green-800 hover:bg-green-900 text-green-800 stroke-green-900',
+                    yellow: 'border-yellow-900 bg-yellow-800 hover:bg-yellow-900 text-yellow-800 stroke-yellow-900',
+                    orange: 'border-orange-900 bg-orange-800 hover:bg-orange-900 text-orange-800 stroke-orange-900',
+                    pink: 'border-pink-900 bg-pink-800 hover:bg-pink-900 text-pink-800 stroke-pink-900',
+                    indigo: 'border-indigo-900 bg-indigo-800 hover:bg-indigo-900 text-indigo-800 stroke-indigo-900',
+                    teal: 'border-teal-900 bg-teal-800 hover:bg-teal-900 text-teal-800 stroke-teal-900',
+                    emerald: 'border-emerald-900 bg-emerald-800 hover:bg-emerald-900 text-emerald-800 stroke-emerald-900',
+                    lime: 'border-lime-900 bg-lime-800 hover:bg-lime-900 text-lime-800 stroke-lime-900'
+                  };
+
+                  return (
+                    <div key={index} className={`relative duration-300 group border ${colorClasses[config.color].split(' ')[0]} border-4 overflow-hidden rounded-2xl relative h-60 w-80 ${colorClasses[config.color].split(' ')[1]} p-5 flex flex-col items-start gap-4 mx-auto transform hover:scale-105`}>
+                      <div className="text-gray-50">
+                        <img 
+                          src={getRankIcon(rank)} 
+                          alt={config.label}
+                          className="w-16 h-16 mb-2"
+                          onError={(e) => {
+                            console.error('Failed to load rank icon:', getRankIcon(rank));
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                        <p className="text-xs">{config.label}</p>
+                      </div>
+                      <button className={`duration-300 ${colorClasses[config.color].split(' ')[2]} border hover:text-gray-50 bg-gray-50 font-semibold ${colorClasses[config.color].split(' ')[3]} px-3 py-2 flex flex-row items-center gap-3 rounded-[15px]`}>
+                        მეტის ნახვა
+                        <svg y="0" xmlns="http://www.w3.org/2000/svg" x="0" width="100" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" height="100" className="w-6 h-6 fill-current">
+                          <path fill-rule="evenodd" d="M22.1,77.9a4,4,0,0,1,4-4H73.9a4,4,0,0,1,0,8H26.1A4,4,0,0,1,22.1,77.9ZM35.2,47.2a4,4,0,0,1,5.7,0L46,52.3V22.1a4,4,0,1,1,8,0V52.3l5.1-5.1a4,4,0,0,1,5.7,0,4,4,0,0,1,0,5.6l-12,12a3.9,3.9,0,0,1-5.6,0l-12-12A4,4,0,0,1,35.2,47.2Z">
+                          </path>
+                        </svg>
+                      </button>
+                      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" className={`group-hover:scale-125 duration-500 absolute -bottom-0.5 -right-20 w-48 h-48 z-10 -my-2 fill-gray-50 ${colorClasses[config.color].split(' ')[4]}`}>
+                        <path stroke-width="5" stroke-miterlimit="10" d="M 50.4 51 C 40.5 49.1 40 46 40 44 v -1.2 a 18.9 18.9 0 0 0 5.7 -8.8 h 0.1 c 3 0 3.8 -6.3 3.8 -7.3 s 0.1 -4.7 -3 -4.7 C 53 4 30 0 22.3 6 c -5.4 0 -5.9 8 -3.9 16 c -3.1 0 -3 3.8 -3 4.7 s 0.7 7.3 3.8 7.3 c 1 3.6 2.3 6.9 4.7 9 v 1.2 c 0 2 0.5 5 -9.5 6.8 S 2 62 2 62 h 60 a 14.6 14.6 0 0 0 -11.6 -11 z" data-name="layer1">
+                        </path>
+                      </svg>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        )
       case 'links':
         return (
           <div className="flex items-center justify-center h-full">

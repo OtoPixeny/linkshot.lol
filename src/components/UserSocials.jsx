@@ -377,7 +377,7 @@ export default function UserSocials({ userDataName }) {
       <div 
         className={`absolute top-0 z-[-2] w-full h-full dark:bg-neutral-950 ${links?.accessKey && !showPrivate ? 'blur-[50px]' : ''}`}
         style={{
-          background: `radial-gradient(ellipse 80% 80% at 50% -20%, ${avatarColors.dominant}39, ${avatarColors.secondary}38, rgba(255,255,255,0))`
+          background: `radial-gradient(ellipse 80% 80% at 50% -20%, ${avatarColors.dominant}39, ${avatarColors.secondary}68, rgba(255,255,255,0))`
         }}
       ></div>
       <div className="fixed top-5 right-5 md:top-10 md:right-32 flex gap-2">

@@ -12,6 +12,7 @@ import UserModel from "@/models/user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomLinksManager from "./CustomLinksManager";
 import { useAvatarSync } from "@/hooks/useAvatarSync";
+import { useSuccessSound } from "@/hooks/useSuccessSound";
 
 export default function ManageForm() {
   const { toast } = useToast();
@@ -20,6 +21,9 @@ export default function ManageForm() {
   
   // Enable avatar synchronization
   useAvatarSync();
+  
+  // Success sound hook
+  const { playSuccessSound } = useSuccessSound();
 
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -213,6 +217,7 @@ export default function ManageForm() {
       const result = await UserModel.update(user.id, userData);
 
       if (result) {
+        playSuccessSound(); // Play success sound
         toast({
           title: "წარმატებით",
           description: "პროფილი წარმატებით განახლდა!",

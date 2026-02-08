@@ -8,11 +8,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import UserModel from "@/models/user";
 import { Music, Play, Save } from "lucide-react";
+import { useSuccessSound } from "@/hooks/useSuccessSound";
 
 export default function MusicManager() {
   const { toast } = useToast();
   const { user } = useUser();
   const { getToken } = useAuth();
+  const { playSuccessSound } = useSuccessSound();
 
   const [spotifyUrl, setSpotifyUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -53,6 +55,7 @@ export default function MusicManager() {
       const result = await UserModel.update(user.id, userData);
 
       if (result) {
+        playSuccessSound(); // Play success sound
         toast({
           title: "წარმატებით",
           description: "მუსიკის ბმულები წარმატებით განახლდა!",
