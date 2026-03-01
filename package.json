@@ -33,6 +33,7 @@
     "express": "^4.22.1",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.303.0",
+    "@heroui/theme": "^2.4.24",
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.3",
     "next-themes": "^0.2.1",
