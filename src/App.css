@@ -141,9 +141,9 @@
   margin-left: auto !important;
   margin-right: auto !important;
   width: 100% !important;
-  max-width: 1350px !important;
+  max-width: 1325px !important;
   padding-left: 0 !important;
-  padding-right: 10px !important;
+  padding-right: 0 !important;
   background: transparent !important;
 }
 
@@ -499,6 +499,10 @@
 .link-my{
   color: #0070b1;
   font-weight: bolder !important;
+}
+
+.dark .link-my {
+  color: #60a5fa !important;
 }
 
 .admin-card{

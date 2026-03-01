@@ -15,11 +15,14 @@ import Auth from '@/pages/Auth'
 import Dashboard from '@/pages/Dashboard'
 import UserProfile from '@/pages/UserProfile'
 import Top3 from '@/pages/Top3'
+import Premium from '@/pages/Premium'
+import PremiumSuccess from '@/pages/PremiumSuccess'
+import PremiumCancel from '@/pages/PremiumCancel'
 
 function App() {
   const location = useLocation()
-  const { playClickSound } = useSuccessSound()
-  const isUserProfilePage = location.pathname !== '/' && !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/top3')
+  const { playSuccessSound } = useSuccessSound()
+  const isUserProfilePage = location.pathname !== '/' && !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/top3') && !location.pathname.startsWith('/premium')
   
   // Add global click sound effect for buttons only
   React.useEffect(() => {
@@ -32,13 +35,13 @@ function App() {
         target.closest('button') ||
         target.closest('[role="button"]')
       ) {
-        playClickSound()
+        playSuccessSound()
       }
     }
 
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
-  }, [playClickSound])
+  }, [playSuccessSound])
   
   return (
     <ThemeProvider
@@ -58,6 +61,9 @@ function App() {
             <Route path="/dashboard/manage" element={<Dashboard />} />
             <Route path="/:username" element={<UserProfile />} />
             <Route path="/top3" element={<Top3 />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/premium/success" element={<PremiumSuccess />} />
+            <Route path="/premium/cancel" element={<PremiumCancel />} />
           </Routes>
         </main>
         <Footer />

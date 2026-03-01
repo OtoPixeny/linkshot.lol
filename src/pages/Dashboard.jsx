@@ -7,6 +7,7 @@ import ManageForm from '@/components/ManageForm'
 import MusicManager from '@/components/MusicManager'
 import UserManagement from '@/components/UserManagement'
 import UserPageLink from '@/components/UserPageLink'
+import ProfileCard from '@/components/ProfileCard'
 import { useUser } from "@clerk/clerk-react"
 import { Mail, Calendar, Crown, RefreshCw, User, Shield, LogOut, Key, Menu, X, ExternalLink, BarChart3, Users, Music, Award } from "lucide-react"
 import UserModel from "@/models/user"
@@ -724,8 +725,8 @@ export default function Dashboard() {
         <div className={`sidebar fixed md:relative w-64 border-gray-200 dark:border-gray-700 flex-shrink-0 z-50 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}>
-          <div className="p-6">
-            <nav className="space-y-2">
+          <div className="p-6 flex flex-col h-full">
+            <nav className="space-y-2 flex-1">
               {menuItems.map((item) => {
                 const Icon = item.icon
                 return (
@@ -737,9 +738,9 @@ export default function Dashboard() {
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       item.id === 'mypage'
-                        ? 'bg-primary text-primary-foreground shadow-md hover:shadow-lg transform hover:scale-[1.02]'
+                        ? 'bg-primary text-primary-foreground shadow-md hover:shadow-lg transform hover:scale-[1.02] dark:bg-accent dark:text-accent-foreground'
                         : activeSection === item.id && item.id !== 'logout'
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-primary text-primary-foreground dark:bg-accent dark:text-accent-foreground'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                     }`}
                   >
@@ -752,6 +753,7 @@ export default function Dashboard() {
                 )
               })}
             </nav>
+            {/* <ProfileCard /> */}
           </div>
         </div>
 

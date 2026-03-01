@@ -140,9 +140,13 @@ export default function UserManagement() {
                 />
                 <h3 className="font-semibold text-sm">{user.name || user.username}</h3>
                 <p className="text-xs text-muted-foreground">@{user.username}</p>
-                <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium mt-2 ${getRankColor(user.rank)}`}>
-                  {getRankIcon(user.rank)}
-                  <span>{user.rank || 'მომხმარებელი'}</span>
+                <div className="flex flex-wrap gap-1 mt-2 justify-center">
+                  {(user.rank || 'მომხმარებელი').split(',').map((rank, index) => (
+                    <div key={index} className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getRankColor(rank.trim())}`}>
+                      {getRankIcon(rank.trim())}
+                      <span>{rank.trim()}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardHeader>

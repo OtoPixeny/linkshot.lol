@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader } from "@/components/ui/loader";
 import { Icons } from "@/components/icons";
+import { InputOtp } from "@heroui/react";
 import UserModel from "../models/user";
 import CustomLinkModel from "../models/customLink";
 import { Share2, Eye, Shield, X, Music, Play, Pause, Volume2 } from "lucide-react";
@@ -419,6 +420,52 @@ export default function UserSocials({ userDataName }) {
           </Button>
         </div>
       </div>
+
+      {/* Floating Music Player - Bottom Right Corner */}
+      {(links.music || links.spotify) && currentTrack && (
+        <div className="fixed bottom-5 right-5 z-50 bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg p-3 min-w-[200px] max-w-[280px]">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <Music className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">მუსიკა ჟღერს</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {links.music ? 'YouTube' : 'Spotify'}
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => handleMusicPlayPause(currentTrack, links.music ? 'youtube' : 'spotify')}
+              className="h-8 w-8 p-0"
+            >
+              {isPlaying ? (
+                <Pause className="w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                if (audioRef) {
+                  audioRef.pause();
+                }
+                setIsPlaying(false);
+                setCurrentTrack(null);
+                setAudioRef(null);
+              }}
+              className="h-8 w-8 p-0"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="grid place-content-center mb-5 mt-14">
         {loading && <div className="relative w-24 h-24"><Loader /></div>}
         
@@ -510,14 +557,18 @@ export default function UserSocials({ userDataName }) {
                     ეს პროფილი დაცულია 4 სიმბოლოიანი პაროლით
                   </p>
                   <div className="space-y-3">
-                    <Input
-                      type="password"
-                      value={inputKey}
-                      onChange={(e) => setInputKey(e.target.value.slice(0, 4))}
-                      placeholder="შეიყვანეთ პაროლი"
-                      maxLength={4}
-                      className="text-center text-lg tracking-widest"
-                    />
+                    <div className="flex justify-center">
+                      <InputOtp
+                        value={inputKey}
+                        onValueChange={setInputKey}
+                        length={4}
+                        description="შეიყვანეთ 4 სიმბოლოიანი პაროლი"
+                        classNames={{
+                          base: "max-w-xs",
+                          input: "text-center text-lg tracking-widest"
+                        }}
+                      />
+                    </div>
                     <Button onClick={handleInput} className="w-full" disabled={inputKey.length !== 4}>
                       შესვლა
                     </Button>
@@ -559,19 +610,23 @@ export default function UserSocials({ userDataName }) {
                           />
                         </div>
                         
-                        {/* Fallback Play Button */}
+                        {/* Play Button */}
                         <div className="flex items-center gap-3">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleLinkClick('music', links.music)}
+                            onClick={() => handleMusicPlayPause(links.music, 'youtube')}
                             className="flex items-center gap-2 border-red-200 hover:border-red-400 dark:border-red-800"
                           >
-                            <Play className="w-4 h-4" />
-                            ახალ ფანჯარაში
+                            {currentTrack === links.music && isPlaying ? (
+                              <Pause className="w-4 h-4" />
+                            ) : (
+                              <Play className="w-4 h-4" />
+                            )}
+                            {currentTrack === links.music && isPlaying ? 'შეჩერება' : 'დაკვრა'}
                           </Button>
                           <span className="text-xs text-muted-foreground">
-                            თუ პლეერი არ იმუშავებს
+                            დაკვრისთვის დააჭირეთ
                           </span>
                         </div>
                       </div>
@@ -596,19 +651,23 @@ export default function UserSocials({ userDataName }) {
                           />
                         </div>
                         
-                        {/* Fallback Play Button */}
+                        {/* Play Button */}
                         <div className="flex items-center gap-3">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleLinkClick('spotify', links.spotify)}
+                            onClick={() => handleMusicPlayPause(links.spotify, 'spotify')}
                             className="flex items-center gap-2 border-green-200 hover:border-green-400 dark:border-green-800"
                           >
-                            <Play className="w-4 h-4" />
-                            Spotify აპლიკაციაში
+                            {currentTrack === links.spotify && isPlaying ? (
+                              <Pause className="w-4 h-4" />
+                            ) : (
+                              <Play className="w-4 h-4" />
+                            )}
+                            {currentTrack === links.spotify && isPlaying ? 'შეჩერება' : 'დაკვრა'}
                           </Button>
                           <span className="text-xs text-muted-foreground">
-                            თუ პლეერი არ იმუშავებს
+                            დაკვრისთვის დააჭირეთ
                           </span>
                         </div>
                       </div>

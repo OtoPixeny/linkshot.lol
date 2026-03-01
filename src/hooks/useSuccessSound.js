@@ -3,7 +3,7 @@ import { useRef } from 'react';
 export const useSuccessSound = () => {
   const audioRef = useRef(null);
 
-  const playClickSound = () => {
+  const playSuccessSound = () => {
     try {
       if (!audioRef.current) {
         audioRef.current = new Audio('/assets/mixkit-negative-tone-interface-tap-2569.wav');
@@ -22,9 +22,9 @@ export const useSuccessSound = () => {
 
       });
     } catch (error) {
-      console.log('Click sound failed:', error);
+      console.log('Success sound failed:', error);
     }
   };
 
-  return { playClickSound };
+  return { playSuccessSound };
 };

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import Logo from "./Logo";
-import { CornerRightDown, Trophy, Moon, Sun, LayoutDashboard, User } from "lucide-react";
+import { CornerRightDown, Trophy, Moon, Sun, LayoutDashboard, User, Sparkles } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useUser } from "@clerk/clerk-react";
 import { UserButton } from "@clerk/clerk-react";
@@ -13,6 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import HoverButton from "@/components/ui/hover-button";
+import "@/components/ui/hover-button.css";
 
 export default function Header() {
   const { isSignedIn, user } = useUser();
@@ -132,6 +134,15 @@ export default function Header() {
                 ლიდერბორდი
               </Link>
             </DropdownMenuItem>
+            <div className="p-2 border-t">
+              <HoverButton 
+                onClick={() => {
+                  navigate('/premium');
+                }}
+              >
+                პრემიუმი
+              </HoverButton>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
